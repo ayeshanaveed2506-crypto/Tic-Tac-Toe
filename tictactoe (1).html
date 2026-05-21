@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic-Tac-Toe — GridZone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:    #1a0a2e;
+    --bg2:   #231040;
+    --bg3:   #2c1654;
+    --neon-yellow: #f9e94e;
+    --neon-pink:   #ff4fa3;
+    --neon-cyan:   #3ff5d4;
+    --x-color: #ff4fa3;
+    --o-color: #3ff5d4;
+    --text:  #f0e8ff;
+    --muted: #9b87c0;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  /* === LASER BACKGROUND CANVAS === */
+  #laser-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.55;
+  }
+
+  /* grid dots */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(180,130,255,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(180,130,255,0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
+  }
+
+  nav {
+    position: relative; z-index: 10; width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 2.5rem;
+    border-bottom: 1px solid rgba(180,130,255,0.18);
+    background: rgba(26,10,46,0.7);
+    backdrop-filter: blur(8px);
+  }
+  .logo {
+    font-family: 'Boogaloo', cursive; font-size: 1.7rem;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 20px rgba(249,233,78,0.6), 0 0 40px rgba(249,233,78,0.3);
+    text-decoration: none;
+  }
+  .logo span { color: var(--neon-pink); text-shadow: 0 0 20px rgba(255,79,163,0.6); }
+  .back-link {
+    font-size: 0.82rem; font-weight: 700; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.05em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--neon-cyan); }
+
+  main {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 2rem 1.5rem 3rem; width: 100%; max-width: 480px;
+  }
+
+  .game-title {
+    font-family: 'Boogaloo', cursive; font-size: 2.6rem; color: var(--text);
+    margin-bottom: 0.15rem; text-align: center;
+    text-shadow: 0 0 30px rgba(180,130,255,0.5), 0 0 60px rgba(180,130,255,0.2);
+  }
+  .game-subtitle { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1.1rem; }
+
+  /* Sound toggle */
+  .sound-toggle { display: flex; align-items: center; gap: 8px; margin-bottom: 1.2rem; cursor: pointer; user-select: none; }
+  .sound-toggle input[type=checkbox] { display: none; }
+  .sound-pill {
+    width: 40px; height: 22px; background: var(--bg3);
+    border-radius: 50px; border: 1px solid rgba(180,130,255,0.25);
+    position: relative; transition: background 0.2s;
+  }
+  .sound-pill::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--muted); transition: all 0.2s;
+  }
+  .sound-toggle.on .sound-pill { background: rgba(63,245,212,0.2); border-color: var(--neon-cyan); }
+  .sound-toggle.on .sound-pill::after { left: 21px; background: var(--neon-cyan); box-shadow: 0 0 8px var(--neon-cyan); }
+  .sound-label { font-size: 0.78rem; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+  .sound-toggle.on .sound-label { color: var(--neon-cyan); }
+
+  .mode-toggle {
+    display: flex; background: var(--bg2);
+    border: 1px solid rgba(180,130,255,0.2);
+    border-radius: 50px; padding: 4px; gap: 4px; margin-bottom: 1.5rem;
+  }
+  .mode-btn {
+    font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700;
+    letter-spacing: 0.05em; padding: 8px 22px; border-radius: 50px;
+    border: none; background: transparent; color: var(--muted); cursor: pointer; transition: all 0.18s;
+  }
+  .mode-btn.active { background: var(--neon-yellow); color: var(--bg); box-shadow: 0 0 16px rgba(249,233,78,0.4); }
+
+  .status-wrap {
+    margin-bottom: 1.2rem; text-align: center; min-height: 2.2rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .status { font-family: 'Boogaloo', cursive; font-size: 1.3rem; color: var(--text); }
+  .status .x { color: var(--x-color); text-shadow: 0 0 14px rgba(255,79,163,0.7), 0 0 30px rgba(255,79,163,0.3); }
+  .status .o { color: var(--o-color); text-shadow: 0 0 14px rgba(63,245,212,0.7), 0 0 30px rgba(63,245,212,0.3); }
+
+  /* === BOARD WRAP for laser win overlay === */
+  .board-wrap {
+    position: relative;
+    width: 100%; max-width: 360px;
+    margin-bottom: 1.75rem;
+  }
+
+  .board {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; width: 100%;
+  }
+
+  /* Win laser line SVG overlay */
+  #win-laser {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    overflow: visible;
+  }
+
+  .cell {
+    aspect-ratio: 1; background: var(--bg2);
+    border: 1.5px solid rgba(180,130,255,0.2);
+    border-radius: 14px; font-family: 'Boogaloo', cursive;
+    font-size: clamp(2.2rem, 9vw, 3.2rem); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.12s, border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+    user-select: none; color: var(--text);
+    position: relative; overflow: hidden;
+  }
+  /* inner shimmer on hover */
+  .cell::after {
+    content: ''; position: absolute; inset: 0; border-radius: 13px;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.07), transparent 70%);
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .cell:hover:not(.taken)::after { opacity: 1; }
+  .cell:hover:not(.taken) {
+    background: var(--bg3); border-color: rgba(180,130,255,0.5);
+    transform: scale(1.05);
+    box-shadow: 0 0 18px rgba(180,130,255,0.2), inset 0 0 12px rgba(180,130,255,0.08);
+  }
+  .cell.x {
+    color: var(--x-color);
+    text-shadow: 0 0 18px rgba(255,79,163,0.9), 0 0 40px rgba(255,79,163,0.5);
+    border-color: rgba(255,79,163,0.35);
+    box-shadow: 0 0 12px rgba(255,79,163,0.15), inset 0 0 20px rgba(255,79,163,0.06);
+  }
+  .cell.o {
+    color: var(--o-color);
+    text-shadow: 0 0 18px rgba(63,245,212,0.9), 0 0 40px rgba(63,245,212,0.5);
+    border-color: rgba(63,245,212,0.35);
+    box-shadow: 0 0 12px rgba(63,245,212,0.15), inset 0 0 20px rgba(63,245,212,0.06);
+  }
+  .cell.win.x {
+    background: rgba(255,79,163,0.12);
+    border-color: var(--x-color);
+    box-shadow: 0 0 30px rgba(255,79,163,0.4), inset 0 0 30px rgba(255,79,163,0.1);
+    animation: winPulseX 1s ease infinite alternate;
+  }
+  .cell.win.o {
+    background: rgba(63,245,212,0.12);
+    border-color: var(--o-color);
+    box-shadow: 0 0 30px rgba(63,245,212,0.4), inset 0 0 30px rgba(63,245,212,0.1);
+    animation: winPulseO 1s ease infinite alternate;
+  }
+  @keyframes winPulseX {
+    from { box-shadow: 0 0 20px rgba(255,79,163,0.3), inset 0 0 20px rgba(255,79,163,0.08); }
+    to   { box-shadow: 0 0 45px rgba(255,79,163,0.6), inset 0 0 35px rgba(255,79,163,0.15); }
+  }
+  @keyframes winPulseO {
+    from { box-shadow: 0 0 20px rgba(63,245,212,0.3), inset 0 0 20px rgba(63,245,212,0.08); }
+    to   { box-shadow: 0 0 45px rgba(63,245,212,0.6), inset 0 0 35px rgba(63,245,212,0.15); }
+  }
+  .cell.pop { animation: pop 0.22s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes pop {
+    from { transform: scale(0.45); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+  }
+
+  /* particle canvas over board */
+  #particle-canvas {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 20;
+  }
+
+  .scores { display: flex; gap: 12px; margin-bottom: 1.75rem; width: 100%; max-width: 360px; }
+  .score-card {
+    flex: 1; background: var(--bg2); border: 1px solid rgba(180,130,255,0.12);
+    border-radius: 12px; padding: 0.85rem 0.5rem; text-align: center;
+    transition: box-shadow 0.3s;
+  }
+  .score-card.x-card { border-color: rgba(255,79,163,0.2); }
+  .score-card.o-card { border-color: rgba(63,245,212,0.2); }
+  .score-card.x-card.lit { box-shadow: 0 0 20px rgba(255,79,163,0.35); }
+  .score-card.o-card.lit { box-shadow: 0 0 20px rgba(63,245,212,0.35); }
+  .score-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .score-val { font-family: 'Boogaloo', cursive; font-size: 1.8rem; line-height: 1; }
+  .x-card .score-val { color: var(--x-color); text-shadow: 0 0 10px rgba(255,79,163,0.5); }
+  .o-card .score-val { color: var(--o-color); text-shadow: 0 0 10px rgba(63,245,212,0.5); }
+  .d-card .score-val { color: var(--muted); }
+
+  .reset-btn {
+    font-family: 'Boogaloo', cursive; font-size: 1.05rem; letter-spacing: 0.04em;
+    padding: 11px 36px; border-radius: 50px;
+    border: 1.5px solid rgba(249,233,78,0.4);
+    background: transparent; color: var(--neon-yellow); cursor: pointer; transition: all 0.18s;
+  }
+  .reset-btn:hover {
+    background: var(--neon-yellow); color: var(--bg);
+    border-color: var(--neon-yellow);
+    box-shadow: 0 0 24px rgba(249,233,78,0.45), 0 0 60px rgba(249,233,78,0.15);
+  }
+
+  footer {
+    position: relative; z-index: 1; margin-top: auto; padding: 1.5rem;
+    text-align: center; font-size: 0.78rem; color: var(--muted);
+    border-top: 1px solid rgba(180,130,255,0.1); width: 100%;
+    background: rgba(26,10,46,0.6); backdrop-filter: blur(4px);
+  }
+  footer a { color: var(--neon-pink); text-decoration: none; }
+
+  @media (max-width: 400px) { nav { padding: 1rem 1.25rem; } }
+</style>
+</head>
+<body>
+
+<canvas id="laser-bg"></canvas>
+<canvas id="particle-canvas"></canvas>
+
+<nav>
+  <a href="index.html" class="logo">Grid<span>Zone</span></a>
+  <a href="index.html" class="back-link">← All Games</a>
+</nav>
+
+<main>
+  <h1 class="game-title">Tic-Tac-Toe</h1>
+  <p class="game-subtitle">Classic · 2 Players · vs AI</p>
+
+  <div class="sound-toggle on" id="soundToggle" onclick="toggleSound()">
+    <input type="checkbox" checked>
+    <div class="sound-pill"></div>
+    <span class="sound-label">🔊 Sound</span>
+  </div>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btn-2p" onclick="setMode('2p')">👥 2 Players</button>
+    <button class="mode-btn" id="btn-ai" onclick="setMode('ai')">🤖 vs AI</button>
+  </div>
+
+  <div class="status-wrap">
+    <div class="status" id="status"><span class="x">X</span> goes first!</div>
+  </div>
+
+  <div class="board-wrap">
+    <div class="board" id="board"></div>
+    <svg id="win-laser" viewBox="0 0 360 360" preserveAspectRatio="none"></svg>
+  </div>
+
+  <div class="scores">
+    <div class="score-card x-card" id="card-x">
+      <div class="score-label">X Wins</div>
+      <div class="score-val" id="sx">0</div>
+    </div>
+    <div class="score-card d-card">
+      <div class="score-label">Draws</div>
+      <div class="score-val" id="sd">0</div>
+    </div>
+    <div class="score-card o-card" id="card-o">
+      <div class="score-label">O Wins</div>
+      <div class="score-val" id="so">0</div>
+    </div>
+  </div>
+
+  <button class="reset-btn" onclick="resetGame()">↺ New Game</button>
+</main>
+
+<footer>
+  <p>Part of <a href="index.html">GridZone</a> · Free games forever · <a href="https://ko-fi.com" target="_blank">Support us ☕</a></p>
+</footer>
+
+<script>
+// ===================== LASER BACKGROUND =====================
+const bgCanvas = document.getElementById('laser-bg');
+const bgCtx = bgCanvas.getContext('2d');
+let W, H;
+
+function resizeBg() {
+  W = bgCanvas.width  = window.innerWidth;
+  H = bgCanvas.height = window.innerHeight;
+}
+resizeBg();
+window.addEventListener('resize', resizeBg);
+
+const LASER_COLORS = [
+  'rgba(255,79,163,',
+  'rgba(63,245,212,',
+  'rgba(249,233,78,',
+  'rgba(180,100,255,',
+  'rgba(77,159,255,',
+];
+
+const lasers = Array.from({length: 7}, (_, i) => ({
+  x: Math.random() * window.innerWidth,
+  y: Math.random() * window.innerHeight,
+  angle: Math.random() * Math.PI * 2,
+  speed: 0.003 + Math.random() * 0.004,
+  length: 180 + Math.random() * 280,
+  color: LASER_COLORS[i % LASER_COLORS.length],
+  alpha: 0.18 + Math.random() * 0.22,
+  width: 1 + Math.random() * 1.5,
+  orbitR: 80 + Math.random() * 200,
+  orbitCX: Math.random() * window.innerWidth,
+  orbitCY: Math.random() * window.innerHeight,
+  orbitAngle: Math.random() * Math.PI * 2,
+  orbitSpeed: (Math.random() - 0.5) * 0.008,
+}));
+
+function drawBg(t) {
+  bgCtx.clearRect(0, 0, W, H);
+  lasers.forEach(l => {
+    l.orbitAngle += l.orbitSpeed;
+    l.x = l.orbitCX + Math.cos(l.orbitAngle) * l.orbitR;
+    l.y = l.orbitCY + Math.sin(l.orbitAngle) * l.orbitR;
+    l.angle += l.speed;
+
+    const dx = Math.cos(l.angle) * l.length;
+    const dy = Math.sin(l.angle) * l.length;
+
+    const grad = bgCtx.createLinearGradient(l.x, l.y, l.x + dx, l.y + dy);
+    grad.addColorStop(0,   l.color + '0)');
+    grad.addColorStop(0.3, l.color + l.alpha + ')');
+    grad.addColorStop(0.7, l.color + l.alpha + ')');
+    grad.addColorStop(1,   l.color + '0)');
+
+    bgCtx.beginPath();
+    bgCtx.moveTo(l.x, l.y);
+    bgCtx.lineTo(l.x + dx, l.y + dy);
+    bgCtx.strokeStyle = grad;
+    bgCtx.lineWidth = l.width;
+    bgCtx.shadowColor = l.color + '0.8)';
+    bgCtx.shadowBlur = 8;
+    bgCtx.stroke();
+
+    // glow dot at center
+    bgCtx.beginPath();
+    bgCtx.arc(l.x + dx * 0.5, l.y + dy * 0.5, l.width * 1.8, 0, Math.PI * 2);
+    bgCtx.fillStyle = l.color + (l.alpha * 0.8) + ')';
+    bgCtx.shadowBlur = 14;
+    bgCtx.fill();
+    bgCtx.shadowBlur = 0;
+  });
+  requestAnimationFrame(drawBg);
+}
+drawBg(0);
+
+// ===================== PARTICLE SYSTEM =====================
+const pCanvas = document.getElementById('particle-canvas');
+const pCtx = pCanvas.getContext('2d');
+pCanvas.width = window.innerWidth;
+pCanvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  pCanvas.width = window.innerWidth;
+  pCanvas.height = window.innerHeight;
+});
+
+let particles = [];
+
+function spawnParticles(x, y, color) {
+  for (let i = 0; i < 38; i++) {
+    const angle = (Math.PI * 2 / 38) * i + Math.random() * 0.3;
+    const speed = 2.5 + Math.random() * 5;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      alpha: 1,
+      size: 2 + Math.random() * 3,
+      color,
+      decay: 0.022 + Math.random() * 0.018,
+      laser: Math.random() > 0.55,
+      length: 12 + Math.random() * 22,
+    });
+  }
+  animateParticles();
+}
+
+let pAnimating = false;
+function animateParticles() {
+  if (pAnimating) return;
+  pAnimating = true;
+  function frame() {
+    pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+    particles = particles.filter(p => p.alpha > 0.02);
+    if (!particles.length) { pAnimating = false; return; }
+    particles.forEach(p => {
+      p.x  += p.vx; p.y  += p.vy;
+      p.vy += 0.12;
+      p.alpha -= p.decay;
+      pCtx.globalAlpha = p.alpha;
+      if (p.laser) {
+        // laser streak
+        const grad = pCtx.createLinearGradient(p.x, p.y, p.x - p.vx * 3, p.y - p.vy * 3);
+        grad.addColorStop(0, p.color);
+        grad.addColorStop(1, 'transparent');
+        pCtx.beginPath();
+        pCtx.moveTo(p.x, p.y);
+        pCtx.lineTo(p.x - p.vx * 3, p.y - p.vy * 3);
+        pCtx.strokeStyle = grad;
+        pCtx.lineWidth = p.size * 0.6;
+        pCtx.shadowColor = p.color;
+        pCtx.shadowBlur = 6;
+        pCtx.stroke();
+        pCtx.shadowBlur = 0;
+      } else {
+        pCtx.beginPath();
+        pCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        pCtx.fillStyle = p.color;
+        pCtx.shadowColor = p.color;
+        pCtx.shadowBlur = 8;
+        pCtx.fill();
+        pCtx.shadowBlur = 0;
+      }
+    });
+    pCtx.globalAlpha = 1;
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+// ===================== WIN LASER LINE =====================
+function drawWinLaser(cells, color) {
+  const svg = document.getElementById('win-laser');
+  svg.innerHTML = '';
+  const boardEl = document.getElementById('board');
+  const boardRect = boardEl.getBoundingClientRect();
+  const boardWrapRect = boardEl.parentElement.getBoundingClientRect();
+
+  const getCellCenter = (idx) => {
+    const cellEls = boardEl.querySelectorAll('.cell');
+    const r = cellEls[idx].getBoundingClientRect();
+    return {
+      x: ((r.left + r.width / 2) - boardWrapRect.left) / boardWrapRect.width * 360,
+      y: ((r.top  + r.height / 2) - boardWrapRect.top) / boardWrapRect.height * 360,
+    };
+  };
+
+  const a = getCellCenter(cells[0]);
+  const b = getCellCenter(cells[2]);
+
+  // Glow layers
+  [12, 6, 2.5].forEach((w, i) => {
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
+    line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', w);
+    line.setAttribute('stroke-linecap', 'round');
+    line.setAttribute('opacity', i === 0 ? '0.25' : i === 1 ? '0.5' : '1');
+    svg.appendChild(line);
+  });
+
+  // Animated traveling dot
+  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  circle.setAttribute('r', '5');
+  circle.setAttribute('fill', color);
+  circle.setAttribute('filter', 'url(#glow)');
+  svg.appendChild(circle);
+
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML = `<filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  svg.insertBefore(defs, svg.firstChild);
+
+  // Animate dot along line
+  const anim = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+  anim.setAttribute('dur', '0.6s');
+  anim.setAttribute('repeatCount', '2');
+  anim.setAttribute('path', `M${a.x},${a.y} L${b.x},${b.y}`);
+  circle.appendChild(anim);
+  anim.beginElement && anim.beginElement();
+
+  // Animate line drawing
+  const totalLen = Math.hypot(b.x - a.x, b.y - a.y);
+  const mainLine = svg.querySelectorAll('line')[2];
+  mainLine.style.strokeDasharray = totalLen;
+  mainLine.style.strokeDashoffset = totalLen;
+  mainLine.style.transition = 'stroke-dashoffset 0.4s ease';
+  requestAnimationFrame(() => { mainLine.style.strokeDashoffset = '0'; });
+}
+
+function clearWinLaser() {
+  document.getElementById('win-laser').innerHTML = '';
+}
+
+// ===================== AUDIO =====================
+const AC = new (window.AudioContext || window.webkitAudioContext)();
+let soundOn = true;
+
+function playTone(freq, type, duration, vol = 0.3, delay = 0) {
+  if (!soundOn) return;
+  try {
+    const osc = AC.createOscillator();
+    const gain = AC.createGain();
+    osc.connect(gain); gain.connect(AC.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, AC.currentTime + delay);
+    gain.gain.setValueAtTime(vol, AC.currentTime + delay);
+    gain.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + delay + duration);
+    osc.start(AC.currentTime + delay);
+    osc.stop(AC.currentTime + delay + duration);
+  } catch(e) {}
+}
+
+function sfxPlace(isX) {
+  playTone(isX ? 520 : 310, 'sine', 0.12, 0.25);
+  playTone(isX ? 780 : 460, 'sine', 0.08, 0.12, 0.06);
+}
+function sfxWin() {
+  [523, 659, 784, 1047].forEach((f, i) => playTone(f, 'sine', 0.22, 0.28, i * 0.1));
+}
+function sfxDraw() {
+  playTone(400,'sine',0.15,0.2); playTone(300,'sine',0.15,0.2,0.15); playTone(220,'sine',0.2,0.2,0.3);
+}
+function sfxClick() { playTone(200, 'sine', 0.06, 0.12); }
+function resumeAC() { if (AC.state === 'suspended') AC.resume(); }
+
+function toggleSound() {
+  resumeAC();
+  soundOn = !soundOn;
+  const el = document.getElementById('soundToggle');
+  el.className = 'sound-toggle' + (soundOn ? ' on' : '');
+  el.querySelector('.sound-label').textContent = soundOn ? '🔊 Sound' : '🔇 Sound';
+  if (soundOn) sfxClick();
+}
+
+// ===================== GAME =====================
+const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let board, current, over, mode = '2p';
+let scores = { X:0, O:0, D:0 };
+
+function setMode(m) {
+  resumeAC(); sfxClick();
+  mode = m;
+  document.getElementById('btn-2p').className = 'mode-btn' + (m==='2p' ? ' active' : '');
+  document.getElementById('btn-ai').className  = 'mode-btn' + (m==='ai'  ? ' active' : '');
+  resetGame();
+}
+
+function resetGame() {
+  board = Array(9).fill(''); current = 'X'; over = false;
+  clearWinLaser();
+  ['card-x','card-o'].forEach(id => document.getElementById(id).classList.remove('lit'));
+  render();
+  setStatus('<span class="x">X</span> goes first!');
+}
+
+function render(winCells = [], newIdx = -1) {
+  const el = document.getElementById('board');
+  el.innerHTML = '';
+  board.forEach((v, i) => {
+    const cell = document.createElement('div');
+    let cls = 'cell';
+    if (v) cls += ' taken ' + v.toLowerCase();
+    if (winCells.includes(i)) cls += ' win';
+    if (i === newIdx) cls += ' pop';
+    cell.className = cls;
+    cell.textContent = v;
+    cell.setAttribute('aria-label', v ? v + ' placed' : 'cell ' + (i+1));
+    if (!v && !over) cell.onclick = () => { resumeAC(); play(i); };
+    el.appendChild(cell);
+  });
+}
+
+function getCellPageCenter(idx) {
+  const cellEls = document.getElementById('board').querySelectorAll('.cell');
+  const r = cellEls[idx].getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+}
+
+function play(i) {
+  if (board[i] || over) return;
+  board[i] = current;
+  sfxPlace(current === 'X');
+  const result = checkWin();
+  render(result ? result.cells : [], i);
+  if (result) {
+    const color = current === 'X' ? '#ff4fa3' : '#3ff5d4';
+    setTimeout(() => {
+      drawWinLaser(result.cells, color);
+      // particle bursts on each winning cell
+      result.cells.forEach(ci => {
+        const pos = getCellPageCenter(ci);
+        spawnParticles(pos.x, pos.y, color);
+      });
+      sfxWin();
+      const cardId = current === 'X' ? 'card-x' : 'card-o';
+      document.getElementById(cardId).classList.add('lit');
+    }, 60);
+    const isAI = mode === 'ai' && current === 'O';
+    setStatus(isAI ? '🤖 AI wins! Try again?' : '<span class="' + current.toLowerCase() + '">' + current + '</span> wins! 🎉');
+    scores[current]++; updateScores(); over = true; return;
+  }
+  if (board.every(c => c)) {
+    setTimeout(sfxDraw, 80);
+    setStatus("It's a draw! 🤝");
+    scores.D++; updateScores(); over = true; render([], i); return;
+  }
+  current = current === 'X' ? 'O' : 'X';
+  if (mode === 'ai' && current === 'O') {
+    setStatus('🤖 AI is thinking...');
+    setTimeout(aiMove, 420);
+  } else {
+    setStatus('<span class="' + current.toLowerCase() + '">' + current + '\'s turn</span>');
+  }
+}
+
+function checkWin() {
+  for (const [a,b,c] of wins)
+    if (board[a] && board[a]===board[b] && board[b]===board[c]) return { cells:[a,b,c] };
+  return null;
+}
+
+function aiMove() {
+  const best = minimax([...board], 'O', 0);
+  play(best.idx);
+}
+
+function minimax(b, player, depth) {
+  const w = checkWinOn(b);
+  if (w === 'O') return { score: 10 - depth };
+  if (w === 'X') return { score: depth - 10 };
+  const empty = b.reduce((a,v,i) => v ? a : [...a,i], []);
+  if (!empty.length) return { score: 0 };
+  const moves = empty.map(i => {
+    const nb = [...b]; nb[i] = player;
+    return { idx:i, score: minimax(nb, player==='O'?'X':'O', depth+1).score };
+  });
+  return player === 'O'
+    ? moves.reduce((a,b) => b.score > a.score ? b : a)
+    : moves.reduce((a,b) => b.score < a.score ? b : a);
+}
+
+function checkWinOn(b) {
+  for (const [a,c,d] of wins)
+    if (b[a] && b[a]===b[c] && b[c]===b[d]) return b[a];
+  return null;
+}
+
+function setStatus(html) { document.getElementById('status').innerHTML = html; }
+function updateScores() {
+  document.getElementById('sx').textContent = scores.X;
+  document.getElementById('so').textContent = scores.O;
+  document.getElementById('sd').textContent = scores.D;
+}
+
+resetGame();
+</script>
+</body>
+</html>
