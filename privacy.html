@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — GridZone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:    #1a0a2e;
+    --bg2:   #231040;
+    --bg3:   #2c1654;
+    --neon-yellow: #f9e94e;
+    --neon-pink:   #ff4fa3;
+    --neon-cyan:   #3ff5d4;
+    --text:  #f0e8ff;
+    --muted: #9b87c0;
+  }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(180,130,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(180,130,255,0.05) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+  nav {
+    position: relative; z-index: 10; width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.1rem 2.5rem;
+    border-bottom: 1px solid rgba(180,130,255,0.18);
+    background: rgba(26,10,46,0.75); backdrop-filter: blur(8px);
+  }
+  .logo { font-family: 'Boogaloo', cursive; font-size: 1.7rem; color: var(--neon-yellow); text-shadow: 0 0 20px rgba(249,233,78,0.5); text-decoration: none; }
+  .logo span { color: var(--neon-pink); }
+  .back-link { font-size: 0.82rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .back-link:hover { color: var(--neon-cyan); }
+
+  main {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 760px;
+    padding: 3rem 2rem 5rem;
+  }
+
+  .page-title {
+    font-family: 'Boogaloo', cursive; font-size: 2.2rem;
+    color: var(--text); margin-bottom: 0.3rem;
+    text-shadow: 0 0 30px rgba(180,130,255,0.3);
+  }
+  .page-date { font-size: 0.8rem; color: var(--muted); margin-bottom: 2.5rem; letter-spacing: 0.05em; }
+
+  .section {
+    background: var(--bg2);
+    border: 1px solid rgba(180,130,255,0.12);
+    border-radius: 16px; padding: 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .section h2 {
+    font-family: 'Boogaloo', cursive; font-size: 1.2rem;
+    color: var(--neon-cyan); margin-bottom: 0.75rem;
+    text-shadow: 0 0 10px rgba(63,245,212,0.3);
+  }
+  .section p, .section li {
+    font-size: 0.92rem; color: var(--muted); line-height: 1.8;
+  }
+  .section ul { padding-left: 1.25rem; margin-top: 0.5rem; }
+  .section ul li { margin-bottom: 0.3rem; }
+  .section a { color: var(--neon-pink); text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+
+  .highlight {
+    border-color: rgba(249,233,78,0.2);
+    background: rgba(249,233,78,0.04);
+  }
+  .highlight h2 { color: var(--neon-yellow); text-shadow: 0 0 10px rgba(249,233,78,0.3); }
+
+  footer {
+    position: relative; z-index: 1; margin-top: auto; padding: 1.25rem;
+    text-align: center; font-size: 0.78rem; color: var(--muted);
+    border-top: 1px solid rgba(180,130,255,0.1); width: 100%;
+    background: rgba(26,10,46,0.6); backdrop-filter: blur(4px);
+  }
+  footer a { color: var(--neon-pink); text-decoration: none; }
+
+  @media (max-width: 500px) { nav { padding: 1rem 1.25rem; } main { padding: 2rem 1.25rem 4rem; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Grid<span>Zone</span></a>
+  <a href="index.html" class="back-link">← Back to Games</a>
+</nav>
+
+<main>
+  <h1 class="page-title">Privacy Policy</h1>
+  <p class="page-date">Last updated: May 25, 2026</p>
+
+  <div class="section highlight">
+    <h2>📋 The Short Version</h2>
+    <p>GridZone is a free casual gaming site. We don't collect your name, email, or any personal information. We may show ads (via Google AdSense) and use basic analytics to understand how people use the site. That's it.</p>
+  </div>
+
+  <div class="section">
+    <h2>1. Who We Are</h2>
+    <p>GridZone ("we", "us", "our") is a free online gaming website available at <a href="https://tic-tac-toe-alpha-fawn-95.vercel.app">tic-tac-toe-alpha-fawn-95.vercel.app</a>. We offer free browser-based games with no registration required.</p>
+  </div>
+
+  <div class="section">
+    <h2>2. Information We Collect</h2>
+    <p>We do <strong style="color:var(--text)">not</strong> collect any personally identifiable information such as your name, email address, or phone number. We do not require you to create an account to use our games.</p>
+    <p style="margin-top:0.75rem">However, the following data may be collected automatically:</p>
+    <ul>
+      <li>Browser type and version</li>
+      <li>Device type (desktop, mobile, tablet)</li>
+      <li>Pages visited and time spent on site</li>
+      <li>Referring website (how you found us)</li>
+      <li>General location (country/city level only, not precise)</li>
+    </ul>
+    <p style="margin-top:0.75rem">This data is collected through third-party services (Google Analytics and Google AdSense) and is used only to improve the site and serve relevant ads.</p>
+  </div>
+
+  <div class="section">
+    <h2>3. Cookies</h2>
+    <p>GridZone uses cookies — small text files stored on your device. These are used by:</p>
+    <ul>
+      <li><strong style="color:var(--text)">Google AdSense</strong> — to show relevant advertisements</li>
+      <li><strong style="color:var(--text)">Google Analytics</strong> — to understand how visitors use our site</li>
+    </ul>
+    <p style="margin-top:0.75rem">You can disable cookies in your browser settings at any time. Note that doing so may affect how some parts of the site function.</p>
+  </div>
+
+  <div class="section">
+    <h2>4. Advertising</h2>
+    <p>We use Google AdSense to display advertisements on our site. Google may use cookies and web beacons to serve ads based on your prior visits to our website or other websites on the internet.</p>
+    <p style="margin-top:0.75rem">You can opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank">Google's Ad Settings</a> or by visiting <a href="https://www.aboutads.info" target="_blank">aboutads.info</a>.</p>
+  </div>
+
+  <div class="section">
+    <h2>5. Third-Party Links</h2>
+    <p>Our site may contain links to third-party websites such as Ko-fi. We are not responsible for the privacy practices of those sites and encourage you to read their privacy policies.</p>
+  </div>
+
+  <div class="section">
+    <h2>6. Children's Privacy</h2>
+    <p>GridZone is intended for general audiences. We do not knowingly collect any personal information from children under the age of 13. If you believe a child has provided us with personal information, please contact us so we can delete it.</p>
+  </div>
+
+  <div class="section">
+    <h2>7. Data Security</h2>
+    <p>Since we do not collect personal data directly, there is minimal risk associated with using GridZone. All games run entirely in your browser and no game data is sent to our servers.</p>
+  </div>
+
+  <div class="section">
+    <h2>8. Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. Any changes will be reflected on this page with an updated date at the top. We encourage you to review this page periodically.</p>
+  </div>
+
+  <div class="section">
+    <h2>9. Contact Us</h2>
+    <p>If you have any questions about this Privacy Policy, you can reach us via our <a href="https://ko-fi.com" target="_blank">Ko-fi page</a>. We'll do our best to respond promptly.</p>
+  </div>
+
+</main>
+
+<footer>
+  <p>© 2026 GridZone · <a href="index.html">Home</a> · <a href="privacy.html">Privacy Policy</a> · <a href="https://ko-fi.com" target="_blank">Support us ☕</a></p>
+</footer>
+
+</body>
+</html>
