@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us — GridZone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#1a0a2e; --bg2:#231040; --bg3:#2c1654;
+    --neon-yellow:#f9e94e; --neon-pink:#ff4fa3; --neon-cyan:#3ff5d4;
+    --text:#f0e8ff; --muted:#9b87c0;
+  }
+  body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; flex-direction:column; align-items:center; overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(180,130,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(180,130,255,0.05) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
+  nav { position:relative; z-index:10; width:100%; display:flex; align-items:center; justify-content:space-between; padding:1.1rem 2.5rem; border-bottom:1px solid rgba(180,130,255,0.18); background:rgba(26,10,46,0.75); backdrop-filter:blur(8px); }
+  .logo { font-family:'Boogaloo',cursive; font-size:1.7rem; color:var(--neon-yellow); text-shadow:0 0 20px rgba(249,233,78,0.5); text-decoration:none; }
+  .logo span { color:var(--neon-pink); }
+  .back-link { font-size:0.82rem; font-weight:700; color:var(--muted); text-decoration:none; transition:color 0.15s; }
+  .back-link:hover { color:var(--neon-cyan); }
+  main { position:relative; z-index:1; width:100%; max-width:760px; padding:3rem 2rem 5rem; }
+  .page-title { font-family:'Boogaloo',cursive; font-size:2.4rem; color:var(--text); margin-bottom:0.3rem; text-shadow:0 0 30px rgba(180,130,255,0.3); }
+  .page-sub { font-size:0.82rem; color:var(--muted); margin-bottom:2.5rem; letter-spacing:0.05em; text-transform:uppercase; }
+  .card { background:var(--bg2); border:1px solid rgba(180,130,255,0.12); border-radius:16px; padding:1.75rem; margin-bottom:1.25rem; }
+  .card h2 { font-family:'Boogaloo',cursive; font-size:1.3rem; color:var(--neon-cyan); margin-bottom:0.75rem; text-shadow:0 0 10px rgba(63,245,212,0.3); }
+  .card p { font-size:0.92rem; color:var(--muted); line-height:1.8; margin-bottom:0.75rem; }
+  .card p:last-child { margin-bottom:0; }
+  .highlight { border-color:rgba(249,233,78,0.2); background:rgba(249,233,78,0.04); }
+  .highlight h2 { color:var(--neon-yellow); text-shadow:0 0 10px rgba(249,233,78,0.3); }
+  .games-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin-top:0.75rem; }
+  .game-item { background:var(--bg3); border:1px solid rgba(180,130,255,0.15); border-radius:10px; padding:10px 14px; font-size:0.88rem; color:var(--text); display:flex; align-items:center; gap:8px; }
+  .game-item span { font-size:1.2rem; }
+  .stat-row { display:flex; gap:12px; flex-wrap:wrap; margin-top:0.75rem; }
+  .stat { background:var(--bg3); border:1px solid rgba(180,130,255,0.15); border-radius:10px; padding:12px 20px; text-align:center; flex:1; min-width:100px; }
+  .stat-val { font-family:'Boogaloo',cursive; font-size:1.6rem; color:var(--neon-yellow); text-shadow:0 0 10px rgba(249,233,78,0.4); }
+  .stat-label { font-size:0.7rem; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; margin-top:2px; }
+  .cta-row { display:flex; gap:12px; flex-wrap:wrap; margin-top:1rem; }
+  .cta-btn { font-family:'Boogaloo',cursive; font-size:1rem; padding:10px 24px; border-radius:50px; text-decoration:none; transition:all 0.15s; }
+  .cta-btn.primary { background:var(--neon-yellow); color:var(--bg); box-shadow:0 0 16px rgba(249,233,78,0.3); }
+  .cta-btn.primary:hover { transform:translateY(-2px); box-shadow:0 0 28px rgba(249,233,78,0.5); }
+  .cta-btn.secondary { border:1.5px solid rgba(255,79,163,0.4); color:var(--neon-pink); }
+  .cta-btn.secondary:hover { background:var(--neon-pink); color:var(--bg); }
+  footer { position:relative; z-index:1; margin-top:auto; padding:1.25rem; text-align:center; font-size:0.78rem; color:var(--muted); border-top:1px solid rgba(180,130,255,0.1); width:100%; background:rgba(26,10,46,0.6); backdrop-filter:blur(4px); }
+  footer a { color:var(--neon-pink); text-decoration:none; }
+  @media(max-width:500px){ nav{padding:1rem 1.25rem;} main{padding:2rem 1.25rem 4rem;} }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">Grid<span>Zone</span></a>
+  <a href="index.html" class="back-link">← Back to Games</a>
+</nav>
+<main>
+  <h1 class="page-title">About GridZone 🎮</h1>
+  <p class="page-sub">Who we are · What we do · Why we do it</p>
+
+  <div class="card highlight">
+    <h2>🚀 Our Mission</h2>
+    <p>GridZone was built with one simple goal — to give everyone access to fun, classic games for free. No downloads, no sign-ups, no paywalls. Just open your browser and play, on any device, anywhere in the world.</p>
+    <p>We believe great games should be accessible to everyone, whether you're on a phone in Karachi or a laptop in New York.</p>
+  </div>
+
+  <div class="card">
+    <h2>🎯 What is GridZone?</h2>
+    <p>GridZone is a free online gaming site featuring classic browser-based games built from scratch with love. Every game on GridZone is hand-coded with smooth animations, sound effects, and a unique visual style that makes them a joy to play.</p>
+    <p>We started with one game and grew to a full collection — and we're adding more all the time!</p>
+    <div class="games-list">
+      <div class="game-item"><span>🔲</span> Tic-Tac-Toe</div>
+      <div class="game-item"><span>🐍</span> Snake</div>
+      <div class="game-item"><span>🔴</span> Connect Four</div>
+      <div class="game-item"><span>🟦</span> 2048</div>
+      <div class="game-item"><span>🃏</span> Memory Match</div>
+      <div class="game-item"><span>🧪</span> Water Sort</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📊 GridZone by the numbers</h2>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val">6</div><div class="stat-label">Games</div></div>
+      <div class="stat"><div class="stat-val">100%</div><div class="stat-label">Free</div></div>
+      <div class="stat"><div class="stat-val">0</div><div class="stat-label">Sign-ups needed</div></div>
+      <div class="stat"><div class="stat-val">∞</div><div class="stat-label">Fun</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>👩‍💻 Who built this?</h2>
+    <p>GridZone is an independent project built and maintained by a solo developer who is passionate about games and the open web. Every line of code, every animation, every sound effect was crafted with care to give you the best possible experience.</p>
+    <p>We're constantly working on new games and improvements. Have a suggestion? We'd love to hear from you!</p>
+  </div>
+
+  <div class="card">
+    <h2>💜 Why it's free</h2>
+    <p>We genuinely believe games should be free and accessible to everyone. GridZone runs on passion and community support. If you enjoy what we've built, consider buying us a coffee — it helps keep the servers running and motivates us to build more!</p>
+    <div class="cta-row">
+      <a href="index.html" class="cta-btn primary">🎮 Play Games</a>
+      <a href="https://ko-fi.com" target="_blank" class="cta-btn secondary">☕ Support Us</a>
+    </div>
+  </div>
+</main>
+<footer>
+  <p>© 2026 GridZone · <a href="index.html">Home</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy Policy</a> · <a href="https://ko-fi.com" target="_blank">Support us ☕</a></p>
+</footer>
+</body>
+</html>
