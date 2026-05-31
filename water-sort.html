@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Water Sort — GridZone</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Baloo+2:wght@800;900&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow-x:hidden;user-select:none;-webkit-tap-highlight-color:transparent;}
+
+body{
+  background:#1a0e2e;
+  font-family:'Nunito',sans-serif;
+  color:#fff;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  /* subtle grid lines like reference */
+  background-image:
+    linear-gradient(rgba(120,80,200,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120,80,200,.07) 1px, transparent 1px);
+  background-size:48px 48px;
+  background-color:#1a0e2e;
+}
+
+/* diagonal glow accents */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 55% 40% at 100% 80%, rgba(180,40,220,.13) 0%,transparent 65%),
+    radial-gradient(ellipse 45% 35% at 5%  60%, rgba(80,40,200,.1)  0%,transparent 60%);
+}
+
+.wrap{
+  position:relative;z-index:1;
+  width:100%;max-width:860px;
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 16px 40px;
+  min-height:100vh;
+}
+
+/* ── TOP NAV ── */
+nav{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  padding:18px 4px 0;border-bottom:1px solid rgba(255,255,255,.07);
+  padding-bottom:16px;margin-bottom:4px;
+}
+.logo{
+  font-family:'Baloo 2',cursive;font-size:28px;font-weight:900;
+  color:#f0d020;text-decoration:none;letter-spacing:-.5px;
+  text-shadow:0 2px 0 rgba(0,0,0,.3);
+}
+.logo span{color:#ff40cc;}
+.back-link{
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;
+  color:rgba(255,255,255,.55);text-decoration:none;letter-spacing:.02em;
+  transition:color .2s;
+}
+.back-link:hover{color:#fff;}
+
+/* ── TITLE AREA ── */
+.title-area{
+  display:flex;flex-direction:column;align-items:center;
+  margin:20px 0 6px;
+}
+.title-row{display:flex;align-items:center;gap:12px;}
+.title-emoji{font-size:36px;line-height:1;}
+.title-text{
+  font-family:'Fredoka One',cursive;font-size:clamp(32px,8vw,54px);font-weight:400;
+  color:#fff;letter-spacing:.01em;
+  text-shadow:0 0 30px rgba(180,120,255,.5), 0 3px 0 rgba(0,0,0,.25);
+}
+.title-sub{
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  color:rgba(255,255,255,.35);letter-spacing:.25em;margin-top:4px;
+}
+
+/* ── CONTROLS ROW ── */
+.ctrl-row{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;margin:16px 0 10px;
+  gap:10px;flex-wrap:wrap;
+}
+.level-badge{
+  background:#f0e020;color:#1a0e2e;
+  font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;
+  padding:8px 22px;border-radius:100px;
+  box-shadow:0 0 16px rgba(240,224,32,.35);
+  white-space:nowrap;
+}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap;}
+.ctrl-btn{
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  color:#fff;background:rgba(100,80,180,.45);
+  border:1.5px solid rgba(180,140,255,.25);
+  padding:8px 16px;border-radius:100px;cursor:pointer;
+  transition:all .18s;display:flex;align-items:center;gap:6px;
+  white-space:nowrap;
+}
+.ctrl-btn:hover{background:rgba(140,100,220,.6);border-color:rgba(180,140,255,.5);transform:scale(1.04);}
+.ctrl-btn:active{transform:scale(.97);}
+
+/* ── HINT ── */
+.hint{
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  color:rgba(255,255,255,.32);text-align:center;
+  margin:4px 0 20px;letter-spacing:.02em;
+}
+
+/* ── TUBE GRID ── */
+#tubeGrid{
+  display:flex;flex-wrap:wrap;justify-content:center;
+  gap:18px;width:100%;
+  padding:4px 0 10px;
+}
+
+/* ── TUBE WRAPPER ── */
+.tube-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+}
+.tube-wrap:active{transform:scale(.95);}
+
+/* selected: lifts up */
+.tube-wrap.selected{
+  transform:translateY(-20px) scale(1.03);
+}
+
+/* shake on invalid */
+.tube-wrap.shake{animation:shake .32s ease-out;}
+@keyframes shake{
+  0%,100%{transform:translateX(0);}
+  20%{transform:translateX(-8px);}
+  40%{transform:translateX(8px);}
+  60%{transform:translateX(-6px);}
+  80%{transform:translateX(6px);}
+}
+
+/* fully sorted tube: subtle green outline */
+.tube-wrap.done .tube-body{
+  border-color:rgba(80,255,160,.55) !important;
+  box-shadow:0 0 0 2px rgba(80,255,160,.2), 0 0 22px rgba(80,255,160,.2), var(--tube-shadow) !important;
+}
+
+/* ── TUBE BODY — matching reference exactly ── */
+.tube-body{
+  width:var(--tw,70px);
+  height:var(--th,230px);
+  background:#0d0718;
+  /* rounded bottom like test tube */
+  border-radius:0 0 var(--tw,70px) var(--tw,70px);
+  border:3px solid rgba(180,160,255,.28);
+  border-top:none;
+  position:relative;
+  overflow:hidden;
+  /* selected highlight */
+  transition:border-color .18s, box-shadow .18s;
+  box-shadow:var(--tube-shadow, 2px 6px 20px rgba(0,0,0,.5));
+}
+/* selected body glow */
+.tube-wrap.selected .tube-body{
+  border-color:rgba(255,255,255,.8);
+  box-shadow:0 0 0 2px rgba(255,255,255,.3), 0 0 28px rgba(255,255,255,.18), 2px 6px 20px rgba(0,0,0,.5);
+}
+
+/* glass shine — left streak */
+.tube-body::before{
+  content:'';position:absolute;
+  top:0;left:12%;width:16%;height:85%;
+  background:linear-gradient(180deg,rgba(255,255,255,.1) 0%,rgba(255,255,255,.03) 70%,transparent 100%);
+  border-radius:0 0 50% 50%;
+  pointer-events:none;z-index:20;
+}
+
+/* ── RIM — chrome opening ── */
+.tube-rim{
+  width:calc(var(--tw,70px) + 12px);
+  height:12px;
+  background:linear-gradient(180deg,rgba(220,200,255,.55),rgba(160,140,220,.3));
+  border-radius:8px 8px 0 0;
+  border:2.5px solid rgba(200,180,255,.4);
+  border-bottom:none;
+  margin-bottom:-2px;
+  position:relative;z-index:5;
+  flex-shrink:0;
+}
+
+/* ── WATER LAYERS ── */
+.water-layers{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  display:flex;flex-direction:column-reverse;
+  pointer-events:none;
+  /* clip to tube rounded bottom */
+  border-radius:0 0 calc(var(--tw,70px) - 3px) calc(var(--tw,70px) - 3px);
+  overflow:hidden;
+}
+.layer{
+  width:100%;
+  flex-shrink:0;
+  position:relative;
+  /* tiny top seam line */
+  border-top:1.5px solid rgba(0,0,0,.25);
+}
+/* top layer lighter surface */
+.layer.top-layer::after{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:5px;
+  background:rgba(255,255,255,.18);
+  pointer-events:none;
+}
+/* inner gloss left side on each layer */
+.layer::before{
+  content:'';position:absolute;
+  top:0;bottom:0;left:8%;width:14%;
+  background:rgba(255,255,255,.07);
+  pointer-events:none;
+}
+
+/* ── OVERLAY ── */
+.overlay{
+  position:fixed;inset:0;z-index:200;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(14,8,28,.93);backdrop-filter:blur(14px);
+  gap:14px;transition:opacity .3s;
+}
+.overlay.hidden{opacity:0;pointer-events:none;}
+.ov-emoji{font-size:60px;animation:float 2.2s ease-in-out infinite alternate;}
+@keyframes float{0%{transform:translateY(0);}100%{transform:translateY(-12px);}}
+.ov-title{
+  font-family:'Nunito',sans-serif;font-size:clamp(24px,6vw,38px);font-weight:900;
+  text-shadow:0 0 24px currentColor;text-align:center;
+}
+.ov-sub{
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;
+  color:rgba(255,255,255,.38);text-align:center;line-height:1.9;padding:0 20px;
+}
+.ov-stat{
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;
+  text-align:center;line-height:2.2;
+}
+.ov-btn{
+  font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;letter-spacing:.05em;
+  color:#1a0e2e;background:#f0e020;
+  border:none;padding:14px 44px;border-radius:100px;cursor:pointer;
+  box-shadow:0 0 28px rgba(240,224,32,.55);
+  transition:all .15s;margin-top:6px;
+}
+.ov-btn:hover{transform:scale(1.07);box-shadow:0 0 40px rgba(240,224,32,.8);}
+
+/* ── LEVEL SELECT MODAL ── */
+.modal-backdrop{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(14,8,28,.95);backdrop-filter:blur(14px);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .25s;
+}
+.modal-backdrop.hidden{opacity:0;pointer-events:none;}
+.modal{
+  background:rgba(40,24,70,.9);border:1px solid rgba(180,140,255,.2);
+  border-radius:20px;padding:28px 24px;
+  max-width:440px;width:calc(100% - 32px);
+  box-shadow:0 20px 60px rgba(0,0,0,.7);
+}
+.modal h2{
+  font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;
+  color:#fff;text-align:center;margin-bottom:18px;
+  text-shadow:0 0 16px rgba(180,120,255,.5);
+}
+.level-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-height:60vh;overflow-y:auto;}
+.lvl-btn{
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  color:#fff;background:rgba(100,80,180,.5);border:1.5px solid rgba(180,140,255,.2);
+  border-radius:10px;padding:10px 4px;cursor:pointer;text-align:center;
+  transition:all .15s;
+}
+.lvl-btn:hover{background:rgba(160,100,240,.65);border-color:rgba(200,160,255,.5);transform:scale(1.07);}
+.lvl-btn.current{background:#f0e020;color:#1a0e2e;border-color:#f0e020;}
+.lvl-btn.solved{border-color:rgba(80,255,160,.4);color:rgba(80,255,160,.9);}
+.modal-close{
+  display:block;margin:18px auto 0;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  color:rgba(255,255,255,.4);background:none;border:none;cursor:pointer;
+  transition:color .2s;
+}
+.modal-close:hover{color:#fff;}
+
+/* ── PARTICLE ── */
+.particle{position:fixed;border-radius:50%;pointer-events:none;z-index:400;animation:pFly var(--pd) ease-out forwards;}
+@keyframes pFly{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--px),var(--py)) scale(0);}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav>
+    <a class="logo" href="index.html">Grid<span>Zone</span></a>
+    <a class="back-link" href="index.html">← All Games</a>
+  </nav>
+
+  <div class="title-area">
+    <div class="title-row">
+      <span class="title-emoji">🧪</span>
+      <span class="title-text">Water Sort</span>
+    </div>
+    <div class="title-sub">POUR · SORT · SOLVE</div>
+  </div>
+
+  <div class="ctrl-row">
+    <div class="level-badge" id="levelBadge">Level 1</div>
+    <div class="btn-group">
+      <button class="ctrl-btn" onclick="showLevelSelect()">📋 Levels</button>
+      <button class="ctrl-btn" onclick="undoMove()">↩ Undo</button>
+      <button class="ctrl-btn" onclick="restartLevel()">↺ Restart</button>
+    </div>
+  </div>
+
+  <div class="hint" id="hintText">Tap a tube to select, then tap where to pour</div>
+
+  <div id="tubeGrid"></div>
+
+  <!-- win overlay -->
+  <div class="overlay hidden" id="overlay">
+    <div class="ov-emoji" id="ovEmoji">🎉</div>
+    <div class="ov-title" id="ovTitle" style="color:#f0e020">Level Complete!</div>
+    <div class="ov-sub"   id="ovSub"></div>
+    <div class="ov-stat"  id="ovStat"></div>
+    <button class="ov-btn" id="ovBtn">Next Level ▶</button>
+  </div>
+
+  <!-- level select modal -->
+  <div class="modal-backdrop hidden" id="levelModal">
+    <div class="modal">
+      <h2>🗂 Select Level</h2>
+      <div class="level-grid" id="levelGrid"></div>
+      <button class="modal-close" onclick="hideLevelSelect()">✕ Close</button>
+    </div>
+  </div>
+
+</div><!-- wrap -->
+
+<script>
+// ═══════════════════════════════
+//  COLOUR PALETTE  (bold, flat)
+// ═══════════════════════════════
+const COLORS = [
+  { id:'red',    fill:'#e82828', light:'#ff5555' },
+  { id:'blue',   fill:'#2060e8', light:'#5090ff' },
+  { id:'orange', fill:'#f07010', light:'#ff9940' },
+  { id:'green',  fill:'#18a030', light:'#40cc60' },
+  { id:'purple', fill:'#9020d0', light:'#c060ff' },
+  { id:'teal',   fill:'#10b0a0', light:'#40ddd0' },
+  { id:'pink',   fill:'#e02890', light:'#ff70c0' },
+  { id:'yellow', fill:'#d4c000', light:'#f0e040' },
+  { id:'cyan',   fill:'#0898d8', light:'#40ccff' },
+  { id:'lime',   fill:'#70c018', light:'#aae040' },
+  { id:'maroon', fill:'#b82030', light:'#e05060' },
+  { id:'grey',   fill:'#5868a0', light:'#8898c8' },
+];
+
+// ═══════════════════════════════
+//  LEVEL DEFINITIONS
+//  Each entry: [numColors, tubeSize]
+//  Tubes = numColors + 2 empty
+// ═══════════════════════════════
+const LEVELS = [
+  // 1-5: 2–4 colours, easy intro
+  [2,4],[3,4],[3,4],[4,4],[4,4],
+  // 6-10: 5 colours
+  [5,4],[5,4],[5,4],[5,4],[5,4],
+  // 11-15: 6 colours
+  [6,4],[6,4],[6,4],[6,4],[6,4],
+  // 16-20: 7 colours
+  [7,4],[7,4],[7,4],[7,4],[7,4],
+  // 21-25: 8 colours
+  [8,4],[8,4],[8,4],[8,4],[8,4],
+  // 26-30: 9 colours
+  [9,4],[9,4],[9,4],[9,4],[9,4],
+  // 31-35: 10 colours
+  [10,4],[10,4],[10,4],[10,4],[10,4],
+  // 36-40: 11 colours
+  [11,4],[11,4],[11,4],[11,4],[11,4],
+  // 41-45: 12 colours
+  [12,4],[12,4],[12,4],[12,4],[12,4],
+  // 46-50: 12 colours, hardest (tube size 5)
+  [12,5],[12,5],[12,5],[12,5],[12,5],
+];
+
+// ═══════════════════════════════
+//  STATE
+// ═══════════════════════════════
+let tubes=[], selected=-1, moves=0, level=1, tubeSize=4;
+let history=[], initialTubes=[];
+let busy=false;
+
+// ═══════════════════════════════
+//  AUDIO
+// ═══════════════════════════════
+let AC=null;
+const getAC=()=>{if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();return AC;};
+function tone(f,t,d,v=.11){
+  try{const a=getAC(),o=a.createOscillator(),g=a.createGain();
+  o.connect(g);g.connect(a.destination);o.type=t;
+  o.frequency.setValueAtTime(f,a.currentTime);
+  g.gain.setValueAtTime(v,a.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);
+  o.start();o.stop(a.currentTime+d);}catch(e){}
+}
+const sndSelect  =()=>{tone(700,'sine',.06,.09);};
+const sndPour    =()=>{tone(440,'sine',.06,.1);setTimeout(()=>tone(360,'sine',.08,.07),55);};
+const sndError   =()=>{tone(180,'sawtooth',.1,.13);};
+const sndDone    =()=>{tone(880,'square',.06,.12);setTimeout(()=>tone(1100,'sine',.08,.1),65);};
+const sndWin     =()=>{[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,'square',.12,.18),i*70));};
+
+// ═══════════════════════════════
+//  TUBE SIZE (responsive)
+// ═══════════════════════════════
+function getTubeDims(n){
+  const W=Math.min(window.innerWidth,860)-32;
+  // figure out how many columns fit
+  const minW=52, gap=18;
+  const cols=Math.min(n, Math.floor((W+gap)/(minW+gap)));
+  const tw=Math.floor((W - (cols-1)*gap) / cols);
+  const w=Math.max(52,Math.min(tw,80));
+  const h=Math.round(w*3.2);
+  return{w,h};
+}
+
+// ═══════════════════════════════
+//  BUILD LEVEL
+// ═══════════════════════════════
+function buildLevel(lvl){
+  const[nc,ts]=LEVELS[Math.min(lvl-1,LEVELS.length-1)];
+  tubeSize=ts;
+  let pool=[];
+  for(let c=0;c<nc;c++) for(let s=0;s<ts;s++) pool.push(c);
+  shuffle(pool);
+  tubes=[];
+  for(let i=0;i<nc;i++) tubes.push(pool.slice(i*ts,i*ts+ts));
+  tubes.push([]);// empty 1
+  tubes.push([]);// empty 2
+  initialTubes=JSON.parse(JSON.stringify(tubes));
+  history=[];
+  selected=-1;moves=0;busy=false;
+}
+
+function startLevel(lvl){
+  if(lvl!==undefined) level=lvl;
+  buildLevel(level);
+  document.getElementById('levelBadge').textContent='Level '+level;
+  document.getElementById('overlay').classList.add('hidden');
+  renderAll();
+  updateHint('Tap a tube to select, then tap where to pour');
+}
+
+function restartLevel(){
+  tubes=JSON.parse(JSON.stringify(initialTubes));
+  history=[];selected=-1;moves=0;busy=false;
+  renderAll();
+  updateHint('Tap a tube to select, then tap where to pour');
+}
+
+function undoMove(){
+  if(!history.length) return;
+  tubes=history.pop();
+  selected=-1;moves=Math.max(0,moves-1);
+  renderAll();
+}
+
+// ═══════════════════════════════
+//  CLICK HANDLER
+// ═══════════════════════════════
+function onTubeClick(idx){
+  if(busy) return;
+
+  if(selected===-1){
+    if(tubes[idx].length===0) return;
+    if(isSolvedTube(idx)) return;
+    selected=idx;
+    sndSelect();
+    renderAll();
+  } else if(selected===idx){
+    selected=-1;
+    renderAll();
+  } else {
+    if(canPour(selected,idx)){
+      doTransfer(selected,idx);
+    } else {
+      sndError();
+      shakeEl('tube-'+idx);
+    }
+  }
+}
+
+function canPour(from,to){
+  if(!tubes[from].length) return false;
+  if(tubes[to].length>=tubeSize) return false;
+  if(!tubes[to].length) return true;
+  return topColor(from)===topColor(to);
+}
+
+function topColor(i){
+  const t=tubes[i];return t.length?t[t.length-1]:-1;
+}
+
+function countTop(i){
+  const t=tubes[i];if(!t.length)return 0;
+  const top=t[t.length-1];let n=0;
+  for(let j=t.length-1;j>=0&&t[j]===top;j--)n++;
+  return n;
+}
+
+// ═══════════════════════════════
+//  TRANSFER (instant — no anim)
+// ═══════════════════════════════
+function doTransfer(from,to){
+  history.push(JSON.parse(JSON.stringify(tubes)));
+  if(history.length>40) history.shift();
+
+  const count=Math.min(countTop(from),tubeSize-tubes[to].length);
+  for(let i=0;i<count;i++) tubes[to].push(tubes[from].pop());
+
+  moves++;
+  sndPour();
+  selected=-1;
+  renderAll();
+
+  // check tube completion
+  tubes.forEach((_,i)=>{
+    if(isSolvedTube(i)&&tubes[i].length>0){
+      const el=document.getElementById('tube-'+i);
+      if(el&&!el.classList.contains('done')){
+        el.classList.add('done');
+        sndDone();
+        burstParticles(el, COLORS[tubes[i][0]].fill);
+      }
+    }
+  });
+
+  if(checkWin()) setTimeout(showWin,500);
+}
+
+function isSolvedTube(i){
+  const t=tubes[i];
+  if(t.length===0) return true;
+  if(t.length!==tubeSize) return false;
+  return t.every(c=>c===t[0]);
+}
+
+function checkWin(){return tubes.every((_,i)=>isSolvedTube(i));}
+
+// ═══════════════════════════════
+//  RENDER
+// ═══════════════════════════════
+function renderAll(){
+  const grid=document.getElementById('tubeGrid');
+  const{w,h}=getTubeDims(tubes.length);
+  const layerH=Math.floor((h-6)/tubeSize);
+
+  grid.innerHTML='';
+  tubes.forEach((tube,idx)=>{
+    const wrap=document.createElement('div');
+    wrap.className='tube-wrap'+(idx===selected?' selected':'')+(isSolvedTube(idx)&&tube.length>0?' done':'');
+    wrap.id='tube-'+idx;
+    wrap.style.setProperty('--tw',w+'px');
+    wrap.style.setProperty('--th',h+'px');
+    wrap.addEventListener('click',()=>onTubeClick(idx));
+
+    // rim
+    const rim=document.createElement('div');
+    rim.className='tube-rim';
+    rim.style.setProperty('--tw',w+'px');
+    wrap.appendChild(rim);
+
+    // body
+    const body=document.createElement('div');
+    body.className='tube-body';
+    body.style.setProperty('--tw',w+'px');
+    body.style.setProperty('--th',h+'px');
+
+    // water layers
+    const layersEl=document.createElement('div');
+    layersEl.className='water-layers';
+    layersEl.style.borderRadius=`0 0 ${w-3}px ${w-3}px`;
+
+    tube.forEach((ci,li)=>{
+      const cd=COLORS[ci];
+      const layer=document.createElement('div');
+      layer.className='layer'+(li===tube.length-1?' top-layer':'');
+      layer.style.height=layerH+'px';
+      layer.style.background=cd.fill;
+      layersEl.appendChild(layer);
+    });
+
+    body.appendChild(layersEl);
+    wrap.appendChild(body);
+    grid.appendChild(wrap);
+  });
+}
+
+// ═══════════════════════════════
+//  WIN
+// ═══════════════════════════════
+function showWin(){
+  sndWin();
+  const key='gz_ws_best_'+level;
+  const prev=+localStorage.getItem(key)||0;
+  const isNew=!prev||moves<prev;
+  if(isNew) localStorage.setItem(key,moves);
+
+  const ov=document.getElementById('overlay');
+  document.getElementById('ovEmoji').textContent=isNew?'🏆':'🎉';
+  document.getElementById('ovTitle').textContent=isNew?'New Record!':'Level Complete!';
+  document.getElementById('ovTitle').style.color=isNew?'#f0e020':'#40ffb0';
+  document.getElementById('ovSub').textContent='Level '+level+' solved in '+moves+' moves.'+(isNew?' Personal best!':'');
+  document.getElementById('ovStat').innerHTML=
+    `<span style="color:#00d4ff">Moves: ${moves}</span>  ·  <span style="color:#f0e020">Best: ${isNew?moves:prev}</span>`;
+
+  const btn=document.getElementById('ovBtn');
+  if(level<50){
+    btn.textContent='Next Level ▶';
+    btn.onclick=()=>{level++;startLevel();};
+  } else {
+    btn.textContent='Play Again';
+    btn.onclick=()=>startLevel(1);
+  }
+  ov.classList.remove('hidden');
+  spawnConfetti();
+}
+
+// ═══════════════════════════════
+//  LEVEL SELECT
+// ═══════════════════════════════
+function showLevelSelect(){
+  const grid=document.getElementById('levelGrid');
+  grid.innerHTML='';
+  LEVELS.forEach((_,i)=>{
+    const lvl=i+1;
+    const btn=document.createElement('button');
+    btn.className='lvl-btn'+(lvl===level?' current':'');
+    const best=localStorage.getItem('gz_ws_best_'+lvl);
+    if(best) btn.classList.add('solved');
+    btn.innerHTML=lvl+(best?`<br/><span style="font-size:10px;opacity:.7">${best}mv</span>`:'');
+    btn.onclick=()=>{hideLevelSelect();startLevel(lvl);};
+    grid.appendChild(btn);
+  });
+  document.getElementById('levelModal').classList.remove('hidden');
+}
+function hideLevelSelect(){
+  document.getElementById('levelModal').classList.add('hidden');
+}
+
+// ═══════════════════════════════
+//  UTILS
+// ═══════════════════════════════
+function updateHint(txt){document.getElementById('hintText').textContent=txt;}
+
+function shakeEl(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.classList.add('shake');
+  setTimeout(()=>el.classList.remove('shake'),350);
+}
+
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function burstParticles(el,color){
+  const rect=el.getBoundingClientRect();
+  const cx=rect.left+rect.width/2, cy=rect.top+24;
+  for(let i=0;i<12;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const a=Math.random()*Math.PI*2, d=28+Math.random()*48;
+    const sz=4+Math.random()*5;
+    p.style.cssText=`left:${cx}px;top:${cy}px;width:${sz}px;height:${sz}px;background:${color};box-shadow:0 0 8px ${color};--px:${Math.cos(a)*d}px;--py:${Math.sin(a)*d}px;--pd:${.3+Math.random()*.4}s;animation-delay:${Math.random()*.06}s;`;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),800);
+  }
+}
+
+function spawnConfetti(){
+  const palette=['#f0e020','#00d4ff','#ff40cc','#40ffb0','#ff6040','#ffffff','#b040ff'];
+  for(let i=0;i<60;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const col=palette[Math.floor(Math.random()*palette.length)];
+    const x=10+Math.random()*80, y=5+Math.random()*35;
+    const sz=5+Math.random()*8;
+    const a=Math.random()*Math.PI*2, d=60+Math.random()*130;
+    p.style.cssText=`left:${x}%;top:${y}%;width:${sz}px;height:${sz}px;background:${col};box-shadow:0 0 6px ${col};--px:${Math.cos(a)*d}px;--py:${Math.sin(a)*d}px;--pd:${.8+Math.random()*1.1}s;animation-delay:${Math.random()*.5}s;border-radius:${Math.random()>0.5?'50%':'2px'};`;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),2000);
+  }
+}
+
+// close modal on backdrop click
+document.getElementById('levelModal').addEventListener('click',function(e){
+  if(e.target===this) hideLevelSelect();
+});
+
+// ═══════════════════════════════
+//  BOOT
+// ═══════════════════════════════
+startLevel(1);
+window.addEventListener('resize',()=>renderAll());
+</script>
+</body>
+</html>
