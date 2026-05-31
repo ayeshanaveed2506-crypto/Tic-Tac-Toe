@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us — GridZone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#1a0a2e; --bg2:#231040; --bg3:#2c1654;
+    --neon-yellow:#f9e94e; --neon-pink:#ff4fa3; --neon-cyan:#3ff5d4;
+    --text:#f0e8ff; --muted:#9b87c0;
+  }
+  body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; flex-direction:column; align-items:center; overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(180,130,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(180,130,255,0.05) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
+  nav { position:relative; z-index:10; width:100%; display:flex; align-items:center; justify-content:space-between; padding:1.1rem 2.5rem; border-bottom:1px solid rgba(180,130,255,0.18); background:rgba(26,10,46,0.75); backdrop-filter:blur(8px); }
+  .logo { font-family:'Boogaloo',cursive; font-size:1.7rem; color:var(--neon-yellow); text-shadow:0 0 20px rgba(249,233,78,0.5); text-decoration:none; }
+  .logo span { color:var(--neon-pink); }
+  .back-link { font-size:0.82rem; font-weight:700; color:var(--muted); text-decoration:none; transition:color 0.15s; }
+  .back-link:hover { color:var(--neon-cyan); }
+  main { position:relative; z-index:1; width:100%; max-width:760px; padding:3rem 2rem 5rem; }
+  .page-title { font-family:'Boogaloo',cursive; font-size:2.4rem; color:var(--text); margin-bottom:0.3rem; text-shadow:0 0 30px rgba(180,130,255,0.3); }
+  .page-sub { font-size:0.82rem; color:var(--muted); margin-bottom:2.5rem; letter-spacing:0.05em; text-transform:uppercase; }
+  .card { background:var(--bg2); border:1px solid rgba(180,130,255,0.12); border-radius:16px; padding:1.75rem; margin-bottom:1.25rem; }
+  .card h2 { font-family:'Boogaloo',cursive; font-size:1.3rem; color:var(--neon-cyan); margin-bottom:0.75rem; }
+  .card p { font-size:0.92rem; color:var(--muted); line-height:1.8; margin-bottom:0.75rem; }
+  .card p:last-child { margin-bottom:0; }
+  .contact-options { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-top:0.5rem; }
+  .contact-option { background:var(--bg3); border:1px solid rgba(180,130,255,0.15); border-radius:12px; padding:1.25rem; text-decoration:none; color:var(--text); transition:all 0.15s; display:flex; flex-direction:column; gap:8px; }
+  .contact-option:hover { border-color:var(--neon-cyan); box-shadow:0 0 16px rgba(63,245,212,0.15); transform:translateY(-3px); }
+  .contact-option .icon { font-size:1.8rem; }
+  .contact-option .label { font-family:'Boogaloo',cursive; font-size:1.05rem; color:var(--neon-cyan); }
+  .contact-option .desc { font-size:0.78rem; color:var(--muted); line-height:1.5; }
+  .faq-item { border-bottom:1px solid rgba(180,130,255,0.1); padding:1rem 0; }
+  .faq-item:last-child { border-bottom:none; padding-bottom:0; }
+  .faq-q { font-weight:700; color:var(--text); font-size:0.92rem; margin-bottom:0.4rem; }
+  .faq-a { font-size:0.88rem; color:var(--muted); line-height:1.7; }
+  .highlight { border-color:rgba(249,233,78,0.2); background:rgba(249,233,78,0.04); }
+  .highlight h2 { color:var(--neon-yellow); }
+  footer { position:relative; z-index:1; margin-top:auto; padding:1.25rem; text-align:center; font-size:0.78rem; color:var(--muted); border-top:1px solid rgba(180,130,255,0.1); width:100%; background:rgba(26,10,46,0.6); backdrop-filter:blur(4px); }
+  footer a { color:var(--neon-pink); text-decoration:none; }
+  @media(max-width:500px){ nav{padding:1rem 1.25rem;} main{padding:2rem 1.25rem 4rem;} }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">Grid<span>Zone</span></a>
+  <a href="index.html" class="back-link">← Back to Games</a>
+</nav>
+<main>
+  <h1 class="page-title">Contact Us 💬</h1>
+  <p class="page-sub">We'd love to hear from you!</p>
+
+  <div class="card highlight">
+    <h2>👋 Get in touch</h2>
+    <p>Have a question, suggestion, bug report, or just want to say hi? We read every message and try to respond as quickly as possible. Choose the best way to reach us below!</p>
+  </div>
+
+  <div class="card">
+    <h2>📬 Ways to reach us</h2>
+    <div class="contact-options">
+      <a href="https://ko-fi.com" target="_blank" class="contact-option">
+        <div class="icon">☕</div>
+        <div class="label">Ko-fi</div>
+        <div class="desc">Send us a message on our Ko-fi page — best for general questions and support</div>
+      </a>
+      <a href="https://reddit.com/r/webgames" target="_blank" class="contact-option">
+        <div class="icon">💬</div>
+        <div class="label">Reddit</div>
+        <div class="desc">Find us on r/WebGames — great for game suggestions and feedback</div>
+      </a>
+      <a href="index.html" class="contact-option">
+        <div class="icon">🎮</div>
+        <div class="label">Play a game!</div>
+        <div class="desc">The best way to support us is to play our games and share them with friends</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>❓ Frequently Asked Questions</h2>
+    <div class="faq-item">
+      <div class="faq-q">Are all games really free?</div>
+      <div class="faq-a">Yes! Every game on GridZone is 100% free forever. No hidden fees, no premium versions, no paywalls.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Do I need to create an account?</div>
+      <div class="faq-a">Never. Just open the site and play — no sign-up, no email, no password required.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can I suggest a new game?</div>
+      <div class="faq-a">Absolutely! We love suggestions. Reach out via Ko-fi or Reddit and tell us what game you'd like to see next.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">I found a bug — how do I report it?</div>
+      <div class="faq-a">Please let us know via Ko-fi or Reddit with the game name and what happened. We fix bugs as fast as possible!</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How can I support GridZone?</div>
+      <div class="faq-a">Share the site with friends, leave feedback, and if you want to go the extra mile — buy us a coffee on Ko-fi! Every bit helps keep the site running and growing.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Will there be more games?</div>
+      <div class="faq-a">Yes! We are constantly working on new games. Follow us on Reddit or check back regularly for new additions.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🐛 Report a bug</h2>
+    <p>Something not working right? Tell us:</p>
+    <p>1. Which game has the issue</p>
+    <p>2. What device and browser you're using</p>
+    <p>3. What happened and what you expected to happen</p>
+    <p>Send this info to us via Ko-fi and we'll get it fixed as soon as possible. Thank you for helping make GridZone better!</p>
+  </div>
+
+</main>
+<footer>
+  <p>© 2026 GridZone · <a href="index.html">Home</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy Policy</a> · <a href="https://ko-fi.com" target="_blank">Support us ☕</a></p>
+</footer>
+</body>
+</html>
